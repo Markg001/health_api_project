@@ -1,5 +1,6 @@
 #This is the Database connection setup
 #This is like a bridge It will connect both endss
+#Connects to the actual database (SQLite) so data can be saved or retrieved
 
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
