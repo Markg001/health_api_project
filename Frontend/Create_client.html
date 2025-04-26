@@ -1,0 +1,31 @@
+<!-- frontend/create_client.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register New Client</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Register New Client</h1>
+
+    <form id="client-form">
+        <label for="name">Full Name:</label><br>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="email">Email Address:</label><br>
+        <input type="email" id="email" name="email" required><br><br>
+
+        <label for="program">Select Program:</label><br>
+        <select id="program" name="program_id" required>
+            <option value="">Loading programs...</option>
+        </select><br><br>
+
+        <button type="submit">Register Client</button>
+    </form>
+
+    <p id="response-msg"></p>
+
+    <script src="scripts.js"></script>
+</body>
+</html>
