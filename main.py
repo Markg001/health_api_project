@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 import models, schemas
 from database import engine, SessionLocal, Base
 from fastapi.security.api_key import APIKeyHeader
+from fastapi.middleware.cors import CORSMiddleware
 
 API_KEY = "supersecretkey"
 API_KEY_NAME = "x-api-key"
@@ -30,6 +31,12 @@ def get_db():
     finally:
         db.close()
 
+@app.get("/programs/")
+def list_programs(db: Session = Depends(get_db)):
+    programs = db.query(models.HealthProgram).all()
+    return programs
+
+
 @app.post("/programs/")
 def create_program(
     program: schemas.HealthProgramCreate,
@@ -49,7 +56,7 @@ def register_client(
     db: Session = Depends(get_db),
     _: str = Depends(verify_api_key)
 ):
-    db_client = models.Client(**client.dict())
+    db_client = models.Client(**client.dict(exclude={"program_ids"}))
     db.add(db_client)
     db.commit()
     db.refresh(db_client)
@@ -59,20 +66,51 @@ def register_client(
 @app.post("/clients/{client_id}/enroll/")
 def enroll_client_in_program(
     client_id: int,
-    program_id: int,
+    enrollment: schemas.Enrollment,  # Expect an array of program IDs
     db: Session = Depends(get_db),
     _: str = Depends(verify_api_key)
 ):
     client = db.query(models.Client).filter(models.Client.id == client_id).first()
-    program = db.query(models.HealthProgram).filter(models.HealthProgram.id == program_id).first()
-
     if not client:
         raise HTTPException(status_code=404, detail="Client not found")
-    if not program:
-        raise HTTPException(status_code=404, detail="Program not found")
 
-    client.program_id = program_id
+    # Enroll client in multiple programs
+    programs = db.query(models.HealthProgram).filter(models.HealthProgram.id.in_(enrollment.program_ids)).all()
+    if not programs:
+        raise HTTPException(status_code=404, detail="Programs not found")
+
+    client.programs.extend(programs)  # Add selected programs to the client's relationship
     db.commit()
     db.refresh(client)
     return client
 
+
+@app.get("/clients/")
+def get_clients(db: Session = Depends(get_db), _: str = Depends(verify_api_key)):
+    clients = db.query(models.Client).all()
+    return clients
+
+
+@app.get("/clients/{client_id}")
+def get_client_profile(client_id: int, db: Session = Depends(get_db), _: str = Depends(verify_api_key)):
+    client = db.query(models.Client).filter(models.Client.id == client_id).first()
+    if not client:
+        raise HTTPException(status_code=404, detail="Client not found")
+
+    return client  # This will return the client and the related programs via the relationship
+
+# Allow your frontend (localhost or wherever you host)
+origins = [
+    "http://localhost:5500",  # If you're serving your HTML with Live Server extension
+    "http://127.0.0.1:5500",  # Another possible localhost address
+    "http://localhost",       # Optional
+    "http://127.0.0.1"         # Optional
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,            # Frontend allowed
+    allow_credentials=True,
+    allow_methods=["*"],              # Allow all methods (GET, POST, OPTIONS etc.)
+    allow_headers=["*"],              # Allow all headers (x-api-key etc.)
+)
