@@ -1,0 +1,26 @@
+<!-- frontend/create_program.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Health Program</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Create a New Health Program</h1>
+
+    <form id="program-form">
+        <label for="name">Program Name:</label><br>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="description">Description:</label><br>
+        <textarea id="description" name="description" rows="4" required></textarea><br><br>
+
+        <button type="submit">Create Program</button>
+    </form>
+
+    <p id="program-msg"></p>
+
+    <script src="scripts.js"></script>
+</body>
+</html>
