@@ -205,8 +205,7 @@ async function loadClientProfile(clientId) {
     profileDiv.innerHTML = "Loading...";
 
     try {
-        const response = await fetchWithAuth(`${API_BASE_URL}/clients/${clientId}`);
-        const client = await response.json();
+        const client = await fetchWithAuth(`${API_BASE_URL}/clients/${clientId}`);
 
         profileDiv.innerHTML = `
             <p><strong>Name:</strong> ${client.name}</p>
@@ -219,6 +218,7 @@ async function loadClientProfile(clientId) {
         profileDiv.innerHTML = " Failed to load client profile.";
     }
 }
+
 
 // Load clients and programs for the enrollment page
 document.addEventListener("DOMContentLoaded", async () => {
