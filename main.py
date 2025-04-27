@@ -8,6 +8,8 @@ import models, schemas
 from database import engine, SessionLocal, Base
 from fastapi.security.api_key import APIKeyHeader
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 API_KEY = "supersecretkey"
 API_KEY_NAME = "x-api-key"
@@ -114,3 +116,11 @@ app.add_middleware(
     allow_methods=["*"],              # Allow all methods (GET, POST, OPTIONS etc.)
     allow_headers=["*"],              # Allow all headers (x-api-key etc.)
 )
+
+# Serve the 'Frontend' folder as static files
+app.mount("/static", StaticFiles(directory="Frontend"), name="static")
+
+# Serve index.html when visiting the root `/`
+@app.get("/", response_class=FileResponse)
+async def read_index():
+    return "Frontend/index.html"
