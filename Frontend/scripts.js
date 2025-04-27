@@ -1,6 +1,7 @@
 // frontend/scripts.js
 
-const API_BASE_URL = "http://localhost:8000"; // Make sure this is correct
+// const API_BASE_URL = "http://localhost:8000"; // Make sure this is correct
+const API_BASE_URL = 'healthapiproject-production-be22.up.railway.app';  // Update this to your Railway URL
 const API_KEY = "supersecretkey"; // Your API key
 
 // Helper function to perform authenticated GET requests
